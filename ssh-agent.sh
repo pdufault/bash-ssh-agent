@@ -3,12 +3,13 @@
 SSH_ENV="$HOME/.ssh/agent-macbook-pro"
 SSH_AGENT_PID="$HOME/.ssh/agent.pid"
 
-function start_agent() {
+function start_agent {
      echo -n " [i] Initializing a new SSH agent..."
      /usr/bin/ssh-agent | sed 's/^echo/#echo/' > "${SSH_ENV}"
      echo -n "$SSH_ENV "
      chmod 600 "${SSH_ENV}"
      source "${SSH_ENV}" > /dev/null
+     echo
 }
 
 # Reconnect to the last ssh-agent that was loaded
@@ -19,14 +20,14 @@ fi
 
 # Check to see if there are any ssh-agents running on the PID
 # that we loaded from the agent file.
-AGENTALIVE=$(ps wwaux | grep -v grep |grep ssh-agent |grep -c $SSH_AGENT_PID)
+AGENTALIVE=$(ps wwaux | grep [s]sh-agent |grep -c $SSH_AGENT_PID)
 if [[ $AGENTALIVE -ne 1 ]]
 then
   # Check to see if this is an interactive session. If so then echo stuff. If not, don't.
   if [[ $- =~ "i" ]]
   then
     start_agent
-    echo " [!] no loaded ssh keys"
+    AGENTALIVE=$(ps wwaux | grep [s]sh-agent |grep -c $SSH_AGENT_PID)
   fi
 fi
 
@@ -38,7 +39,7 @@ if [[ $AGENTALIVE -eq 1 ]]; then
     no_key_loaded=$(ssh-add -l | grep -c "The agent has no identities.")
     if [[ $no_key_loaded -eq 1 ]]; then
       echo " [!] no loaded ssh keys"
-      if [[ -e ~/.ssh/id_rsa ]]; then
+      if [[ -e ~/.ssh/id_rsa ]] || [[ -e ~/.ssh/id_ed25519 ]]; then
         ssh-add
       fi
     else
