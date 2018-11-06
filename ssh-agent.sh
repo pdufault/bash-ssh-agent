@@ -20,7 +20,7 @@ function agent_restore_or_start() {
     source $SSH_ENV
     agent_check_alive
   else
-    start_agent
+    agent_start
     agent_check_alive
   fi
 }
